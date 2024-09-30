@@ -161,14 +161,14 @@ fun GetMyBox(
 @Composable
 fun UnitConverter(){
 
-    var inputValue = remember { mutableStateOf("")}
-    var outputValue = remember { mutableStateOf("") }
-    var inputUnit = remember { mutableStateOf("Meters")}
-    var outputUnit = remember { mutableStateOf("Meters")}
+    val inputValue = remember { mutableStateOf("")}
+    val outputValue = remember { mutableStateOf("") }
+    val inputUnit = remember { mutableStateOf("Meters")}
+    val outputUnit = remember { mutableStateOf("Meters")}
     val iExpanded = remember { mutableStateOf(false)}
     val oExpanded = remember { mutableStateOf(false)}
-    var conversionFactor = remember { mutableDoubleStateOf(1.00) }
-    var oConversionFactor = remember { mutableDoubleStateOf(1.00) }
+    val conversionFactor = remember { mutableDoubleStateOf(1.00) }
+    val oConversionFactor = remember { mutableDoubleStateOf(1.00) }
 
     val customTextStyle = TextStyle(
         fontFamily = FontFamily.Serif,
@@ -181,7 +181,7 @@ fun UnitConverter(){
     fun convertUnits(){
         //?: - elvis operator
         val inputValueDouble = inputValue.value.toDoubleOrNull() ?: 0.0
-        val result = (inputValueDouble * conversionFactor.value * 100.0/oConversionFactor.value).roundToInt()/100.0
+        val result = (inputValueDouble * conversionFactor.doubleValue * 100.0/oConversionFactor.doubleValue).roundToInt()/100.0
         outputValue.value = result.toString()
     }
 
@@ -222,6 +222,6 @@ fun UnitConverter(){
 
 @Preview(showBackground = true)
 @Composable
-fun unitConverterPreview() {
+fun UnitConverterPreview() {
     UnitConverter()
 }
