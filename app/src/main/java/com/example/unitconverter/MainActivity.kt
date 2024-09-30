@@ -1,8 +1,6 @@
 package com.example.unitconverter
 
 import android.os.Bundle
-import android.util.MutableBoolean
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
@@ -11,7 +9,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -26,17 +23,12 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import com.example.unitconverter.ui.theme.UnitConverterTheme
 import kotlin.math.roundToInt
@@ -65,14 +57,16 @@ fun GetMyBox(
     inputValue : MutableState<String>,
     outputValue : MutableState<String>,
     outputUnit : MutableState<String>,
-    conversionFactor : MutableState<Double>
+    conversionFactor : MutableState<Double>,
+    oConversionFactor : MutableState<Double>,
+    ifInPut : Boolean
 )
 {
 
     fun convertUnits(){
         //?: - elvis operator
         val inputValueDouble = inputValue.value.toDoubleOrNull() ?: 0.0
-        val result = (inputValueDouble * conversionFactor.value * 100).roundToInt()/100.0
+        val result = (inputValueDouble * conversionFactor.value * 100.0/oConversionFactor.value).roundToInt()/100.0
         outputValue.value = result.toString()
     }
 
@@ -85,15 +79,26 @@ fun GetMyBox(
 
 
         {
-            Text(text = "Select")
+            if(ifInPut){
+                Text(text = inputUnit.value)
+            }
+            else{
+                Text(text = outputUnit.value)
+            }
             Icon(Icons.Default.ArrowDropDown,contentDescription = "Arrow Down")
         }
         DropdownMenu(expanded = toExpanded.value, onDismissRequest = {toExpanded.value = false}){
             DropdownMenuItem(text = {Text("Centimeters")}, onClick = {
 
                 toExpanded.value = false
-                inputUnit.value = "Centimeters"
-                conversionFactor.value = 0.01
+                if(ifInPut){
+                    inputUnit.value = "Centimeters"
+                    conversionFactor.value = 0.01
+                }
+                else{
+                    outputUnit.value = "Centimeters"
+                    oConversionFactor.value = 0.01
+                }
                 convertUnits()
 
 
@@ -102,24 +107,47 @@ fun GetMyBox(
             DropdownMenuItem(text = {Text("Meters")}, onClick = {
 
                 toExpanded.value = false
-                inputUnit.value = "Meters"
-                conversionFactor.value = 1.0
+
+                if(ifInPut){
+                    inputUnit.value = "Meters"
+                    conversionFactor.value = 1.0
+                }
+                else{
+                    outputUnit.value = "Meters"
+                    oConversionFactor.value = 1.0
+                }
+
                 convertUnits()
                  })
             DropdownMenuItem(text = {Text("Feet")}, onClick = {
 
 
                 toExpanded.value = false
-                inputUnit.value = "Feet"
-                conversionFactor.value = 0.3048
+
+                if(ifInPut){
+                    inputUnit.value = "Feet"
+                    conversionFactor.value = 0.3048
+                }
+                else{
+                    outputUnit.value = "Feet"
+                    oConversionFactor.value = 0.3048
+                }
                 convertUnits()
             })
             DropdownMenuItem(text = {Text("Millimeters")}, onClick = {
 
 
                 toExpanded.value = false
-                inputUnit.value = "Millimeters"
-                conversionFactor.value = 0.001
+
+                if(ifInPut){
+                    inputUnit.value = "Millimeters"
+                    conversionFactor.value = 0.001
+                }
+                else{
+                    outputUnit.value = "Millimeters"
+                    oConversionFactor.value = 0.001
+                }
+
                 convertUnits()
             })
         }
@@ -131,13 +159,19 @@ fun UnitConverter(){
 
     var inputValue = remember { mutableStateOf("")}
     var outputValue = remember { mutableStateOf("") }
-    var inputUnit = remember { mutableStateOf("Centimeters")}
+    var inputUnit = remember { mutableStateOf("Meters")}
     var outputUnit = remember { mutableStateOf("Meters")}
     val iExpanded = remember { mutableStateOf(false)}
     val oExpanded = remember { mutableStateOf(false)}
-    var conversionFactor = remember { mutableDoubleStateOf(0.01) }
+    var conversionFactor = remember { mutableDoubleStateOf(1.00) }
+    var oConversionFactor = remember { mutableDoubleStateOf(1.00) }
 
-
+    fun convertUnits(){
+        //?: - elvis operator
+        val inputValueDouble = inputValue.value.toDoubleOrNull() ?: 0.0
+        val result = (inputValueDouble * conversionFactor.value * 100.0/oConversionFactor.value).roundToInt()/100.0
+        outputValue.value = result.toString()
+    }
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -151,17 +185,19 @@ fun UnitConverter(){
         OutlinedTextField(
             value = inputValue.value,
             onValueChange = {
-                            inputValue.value = it
+                inputValue.value = it
+                convertUnits()
             },
             label = {Text("{Enter value}")}
+
         )
         Spacer(modifier = Modifier.height(16.dp))
         Row {
-            GetMyBox(iExpanded,inputUnit,inputValue,outputValue,outputUnit, conversionFactor,)
-            GetMyBox(oExpanded,inputUnit,inputValue,outputValue,outputUnit ,conversionFactor)
+            GetMyBox(iExpanded,inputUnit,inputValue,outputValue,outputUnit, conversionFactor, oConversionFactor, true)
+            GetMyBox(oExpanded,inputUnit,inputValue,outputValue,outputUnit, conversionFactor, oConversionFactor, false)
         }
         Spacer(modifier = Modifier.height(16.dp))
-        Text("Result:")
+        Text("Result: ${outputValue.value} ${outputUnit.value}")
     }
 }
 
