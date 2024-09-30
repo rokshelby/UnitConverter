@@ -28,8 +28,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.unitconverter.ui.theme.UnitConverterTheme
 import kotlin.math.roundToInt
 
@@ -166,6 +170,14 @@ fun UnitConverter(){
     var conversionFactor = remember { mutableDoubleStateOf(1.00) }
     var oConversionFactor = remember { mutableDoubleStateOf(1.00) }
 
+    val customTextStyle = TextStyle(
+        fontFamily = FontFamily.Serif,
+        fontSize = 32.sp,
+        color = Color.DarkGray
+
+    )
+
+
     fun convertUnits(){
         //?: - elvis operator
         val inputValueDouble = inputValue.value.toDoubleOrNull() ?: 0.0
@@ -180,7 +192,9 @@ fun UnitConverter(){
 
     ) {
         //here all the ui elements will be stacked on each other
-        Text("Unit Converter")
+        Text("Unit Converter",
+            style = customTextStyle
+        )
         Spacer(modifier = Modifier.height(16.dp))
         OutlinedTextField(
             value = inputValue.value,
@@ -188,7 +202,7 @@ fun UnitConverter(){
                 inputValue.value = it
                 convertUnits()
             },
-            label = {Text("{Enter value}")}
+            label = {Text(text = "Enter ${inputUnit.value}")}
 
         )
         Spacer(modifier = Modifier.height(16.dp))
@@ -197,7 +211,11 @@ fun UnitConverter(){
             GetMyBox(oExpanded,inputUnit,inputValue,outputValue,outputUnit, conversionFactor, oConversionFactor, false)
         }
         Spacer(modifier = Modifier.height(16.dp))
-        Text("Result: ${outputValue.value} ${outputUnit.value}")
+
+        //Result Text
+        Text("Result: ${outputValue.value} ${outputUnit.value}",
+                style = customTextStyle
+        )
     }
 }
 
